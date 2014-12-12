@@ -6,6 +6,7 @@ import (
   "net/http"
   "net/http/fcgi"
   "os"
+  "time"
 )
 
 type FastCGIServer struct{}
@@ -15,14 +16,20 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+  fmt.Fprintln(os.Stderr, "Server started at ", time.Now().String())
+
   listener, err := net.Listen("tcp", "127.0.0.1:9000")
   if err != nil {
-    fmt.Fprint(os.Stderr, "Failed to open socket 9000: ", err)
+    fmt.Fprintln(os.Stderr, "Failed to open socket 9000: ", err)
+    os.Exit(1)
   }
 
   srv := new(FastCGIServer)
   err = fcgi.Serve(listener, srv)
   if err != nil {
-    fmt.Fprint(os.Stderr, "Server crashed: ", err)
+    fmt.Fprintln(os.Stderr, "Server crashed: ", err)
+    os.Exit(1)
   }
+
+  fmt.Fprintln(os.Stderr, "Server stopped at ", time.Now().String())
 }
