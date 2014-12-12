@@ -1,7 +1,7 @@
 server {
   listen 80;
   server_name caalum.kerrickstaley.com;
-  root /home/nginx/caalum;
+  root /home/nginx/caalum/static;
 
   location / {
     try_files $uri $uri.html $uri/index.html =404;
