@@ -6,10 +6,10 @@ echo '== Pushing static files' >&2
 scp -r static ${server}:
 
 echo '== Building API binary' >&2
-go build main.go && {
+make build/caalum && {
   echo '== Pushing API binary' >&2
   ssh ${server} 'killall caalum_api'
-  scp main ${server}:caalum_api
+  scp build/caalum ${server}:caalum_api
   ssh ${server} 'nohup ./caalum_api >> caalum_api.out 2>> caalum_api.err &'
 }
 
