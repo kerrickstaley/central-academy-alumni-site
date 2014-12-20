@@ -1,35 +1,22 @@
 package main
 
 import (
-  "fmt"
-  "net"
-  "net/http"
-  "net/http/fcgi"
-  "os"
-  "time"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
 )
 
-type FastCGIServer struct{}
-
-func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-  resp.Write([]byte("{}"))
-}
-
 func main() {
-  fmt.Fprintln(os.Stderr, "Server started at ", time.Now().String())
+	var (
+		port = flag.Int("port", 8080, "http listen port")
+	)
+	flag.Parse()
 
-  listener, err := net.Listen("tcp", "127.0.0.1:9000")
-  if err != nil {
-    fmt.Fprintln(os.Stderr, "Failed to open socket 9000: ", err)
-    os.Exit(1)
-  }
+	static := http.FileServer(http.Dir("static"))
+	http.Handle("/", static)
 
-  srv := new(FastCGIServer)
-  err = fcgi.Serve(listener, srv)
-  if err != nil {
-    fmt.Fprintln(os.Stderr, "Server crashed: ", err)
-    os.Exit(1)
-  }
-
-  fmt.Fprintln(os.Stderr, "Server stopped at ", time.Now().String())
+	addr := fmt.Sprintf(":%d", *port)
+	log.Println("listening at", addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
